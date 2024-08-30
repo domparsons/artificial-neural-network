@@ -392,7 +392,7 @@ ResultVisualiser.show_validation_error_plot(epochs, epoch_split, mean_validation
 ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
 
 # Read LINEST actual and prediction data into a DataFrame
-file_path = '/Users/domparsons/Documents/Loughborough/Year 2/AI Methods/ANN Coursework/compare-data.xlsx'
+file_path = '/Users/domparsons/Developer/Python/artificial-neural-network/compare-data.xlsx'
 columns = ['Index flood', 'Pred']
 df = pd.read_excel(file_path, usecols=columns)
 y_test = df['Index flood'].values
