@@ -347,7 +347,7 @@ class ResultVisualiser:
 
 # Load and preprocess data
 data_processor = DataProcessor()
-file_path = '/Users/domparsons/Documents/Loughborough/Year 2/AI Methods/ANN Coursework/FEHDataStudent.xlsx'
+file_path = '/Users/domparsons/Developer/Python/artificial-neural-network/FEHDataStudent.xlsx'
 sheet_name = 'Sheet1'
 columns = ['AREA', 'BFIHOST', 'FARL', 'FPEXT', 'LDP', 'PROPWET', 'RMED-1D', 'SAAR', 'Index flood']
 df = data_processor.load_and_process_data(file_path, sheet_name, columns)
