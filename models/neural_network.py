@@ -8,24 +8,19 @@ class NeuralNetwork:
         self.hidden_layer_size = hidden_layer_size
         self.output_size = output_size
 
-        # Initialise weights and biases for the hidden layer
         self.hidden_layer_weights = np.random.randn(input_size, hidden_layer_size) * 0.01
         self.hidden_layer_biases = np.array([random.uniform(-0.1, 0.1) for _ in range(hidden_layer_size)])
 
-        # Initialise weights and biases for the output layer
         self.output_layer_weights = np.random.randn(hidden_layer_size, output_size)
         self.output_layer_bias = random.uniform(-0.1, 0.1)
 
-        # Store previous change in weights for momentum
         self.previous_output_weight_change = np.zeros_like(self.output_layer_weights)
         self.previous_hidden_weight_change = np.zeros_like(self.hidden_layer_weights)
 
     def train(self, training_data, validation_data, epochs, initial_learning_rate, final_learning_rate, momentum_rate,
               epoch_split):
-        # Store mean validation errors in a variable to plot error change through epochs
         mean_validation_errors = []
 
-        # Training loop
         for epoch in range(epochs):
             # Update the learning rate
             learning_rate = self.simulated_annealing(initial_learning_rate, final_learning_rate, epochs, epoch)

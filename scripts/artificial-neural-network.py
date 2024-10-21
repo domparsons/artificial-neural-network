@@ -10,22 +10,18 @@ from visualisation.result_visualiser import ResultVisualiser
 
 
 def main():
-    # Load and process data
     data_processor = DataProcessor()
     df = data_processor.load_and_process_data(FilePaths.data_file, FilePaths.sheet_name, FilePaths.columns)
 
-    # Split data
     splitter = DataSplitter(df)
     training_data, validation_data, testing_data = splitter.split_data()
 
-    # Standardize data
     train_and_validate = pd.concat([training_data, validation_data], axis=0)
     standardiser = DataStandardiser()
     standardised_training_data, standardised_validation_data, standardised_testing_data = standardiser.standardise_data(
         train_and_validate, training_data, validation_data, testing_data
     )
 
-    # Initialize and train the neural network
     input_size = len(standardised_training_data.columns)
     neural_network = NeuralNetwork(input_size, Hyperparameters.hidden_layer_size, Hyperparameters.output_size)
     mean_validation_errors, hidden_layer_weights, hidden_layer_biases, output_layer_weights, output_layer_bias = neural_network.train(
@@ -34,35 +30,28 @@ def main():
         Hyperparameters.momentum_rate, Hyperparameters.epoch_split
     )
 
-    # Predict flood index using the test data
     flood_predictor = FloodPredictor(hidden_layer_weights, hidden_layer_biases, output_layer_weights, output_layer_bias)
     y_predict = flood_predictor.predict(standardised_testing_data, train_and_validate)
     y_test = testing_data['Index flood'].values
 
-    # Evaluate the model
     correlation_coefficient, precision, mae = FloodPredictor.evaluate(y_test, y_predict)
     threshold = 60
 
-    # Visualize results
     ResultVisualiser.show_scatter_plot(y_test, y_predict)
     ResultVisualiser.show_validation_error_plot(Hyperparameters.epochs, Hyperparameters.epoch_split, mean_validation_errors)
     ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
 
-    # Compare with LINEST data
     compare_with_linest(FilePaths.compare_file, threshold)
 
 
 def compare_with_linest(file_path, threshold):
-    # Load comparison data from LINEST
     columns = ['Index flood', 'Pred']
     df = pd.read_excel(file_path, usecols=columns)
     y_test = df['Index flood'].values
     y_predict = df['Pred'].values
 
-    # Visualize comparison
     ResultVisualiser.show_scatter_plot(y_test, y_predict)
 
-    # Evaluate and print comparison data
     correlation_coefficient, precision, mae = FloodPredictor.evaluate(y_test, y_predict)
     ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
 

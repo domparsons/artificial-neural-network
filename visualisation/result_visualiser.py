@@ -1,26 +1,29 @@
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import plotly.express as px
 
 class ResultVisualiser:
 
-    # Create and show a scatter graph of the predicted and actual data
     @staticmethod
     def show_scatter_plot(y_test, y_predict):
-        plt.scatter(y_test, y_predict)
-        plt.xlabel('Actual')
-        plt.ylabel('Predicted')
-        plt.title('Actual vs Predicted')
-        plt.show()
+        fig = px.scatter(x=y_test, y=y_predict, labels={'x': 'Actual', 'y': 'Predicted'}, title='Actual vs Predicted')
+        fig.update_traces(marker=dict(size=8, color='blue', opacity=0.6))
+        fig.update_layout(xaxis_title='Actual', yaxis_title='Predicted')
+        fig.show()
 
-    # Plot and show a line graph of the validation error
     @staticmethod
     def show_validation_error_plot(epochs, epoch_split, mean_validation_errors):
-        plt.plot(range(0, epochs, epoch_split), mean_validation_errors, marker='o', linestyle='-')
-        plt.xlabel('Epochs')
-        plt.ylabel('Mean Validation Error')
-        plt.title('Mean Validation Errors Throughout Training')
-        plt.show()
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=list(range(0, epochs, epoch_split)),
+                                 y=mean_validation_errors,
+                                 mode='lines+markers',
+                                 line=dict(color='firebrick', width=2),
+                                 marker=dict(size=8),
+                                 name='Mean Validation Error'))
+        fig.update_layout(title='Mean Validation Errors Throughout Training',
+                          xaxis_title='Epochs',
+                          yaxis_title='Mean Validation Error')
+        fig.show()
 
-    # Print the correlation and precision calculations
     @staticmethod
     def print_prediction_data(correlation_coefficient, precision, threshold, mae):
         print("\nPrediction data:")
