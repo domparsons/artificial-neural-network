@@ -1,24 +1,26 @@
 # Artificial Neural Network for Flood Prediction
 
-This project implements an Artificial Neural Network (ANN) to predict the *Index Flood* based on environmental features such as area, wetness, and other parameters from hydrological datasets. The network is trained using a custom dataset and evaluated for its performance using error metrics like Mean Absolute Error (MAE) and correlation coefficients.
+This project implements an Artificial Neural Network (ANN) to predict the *Index Flood* based on environmental features such as area, wetness, and other parameters from hydrological datasets. The network leverages modular code organization, enabling customization and scalability.
 
 ## Features
 
-- Customizable ANN structure with hyperparameters.
-- Data standardization and splitting into training, validation, and test sets.
-- Flood prediction using a trained model with interactive data visualization using `plotly`.
-- Validation and evaluation metrics, including error rates and precision.
+- **Modular Design**: Organized into distinct modules for data processing, model training, prediction, and visualization.
+- **Customizable ANN**: Hyperparameters like hidden layers, epochs, and learning rates can be adjusted in a configuration file (`config/config.py`).
+- **Data Standardization**: Implements robust data preprocessing for improved model performance.
+- **Interactive Visualization**: Plots for validation errors and predicted vs. actual floods are generated using `plotly`.
+- **Evaluation Metrics**: Includes metrics like Mean Absolute Error (MAE) and correlation coefficients for model evaluation.
+- **Comparison Tool**: Compare ANN predictions with external data (e.g., LINEST predictions) using a provided Excel file.
+
+---
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
 - [File Structure](#file-structure)
-- [Configuration](#configuration)
-- [Dependencies](#dependencies)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+- [Modules](#modules)
+
+---
 
 ## Installation
 
@@ -29,7 +31,7 @@ This project implements an Artificial Neural Network (ANN) to predict the *Index
     cd artificial-neural-network
     ```
 
-2. Create a virtual environment (optional but recommended):
+2. Set up a virtual environment (optional but recommended):
 
     ```bash
     python -m venv env
@@ -42,18 +44,44 @@ This project implements an Artificial Neural Network (ANN) to predict the *Index
     pip install -r requirements.txt
     ```
 
-4. Make sure you have the necessary Excel data files (`FEHDataStudent.xlsx` and `compare-data.xlsx`) located in the project root directory.
+4. Place the required Excel files (`FEHDataStudent.xlsx` and `compare-data.xlsx`) in the `data` directory.
+
+---
 
 ## Usage
 
-1. **Train the Model**: After setting up the project, you can train the model by running:
+1. **Train the Model**: Run the main script to process the data, train the model, and visualize results:
 
     ```bash
     python artificial-neural-network.py
     ```
 
-2. **Hyperparameters**: You can customize the hyperparameters like `epochs`, `learning rates`, and `hidden layers` in the `config.yaml` file.
+2. **Hyperparameter Tuning**: Adjust hyperparameters such as learning rate, hidden layer size, and number of epochs in `config/config.py`.
 
-3. **Plotting**: Interactive plots for validation errors and the predicted vs actual index flood can be generated, and they'll open automatically in your browser.
+3. **Compare Predictions**: To evaluate model predictions against external data (e.g., LINEST results), ensure `compare-data.xlsx` is in the `data` directory, then execute the script as usual.
 
-4. **Comparing Data**: Use the `compare_with_linest` function to compare model predictions with LINEST predictions from the Excel file.
+4. **Output**: The script generates interactive plots and prints evaluation metrics to the console.
+
+---
+
+## File Structure
+
+```plaintext
+artificial-neural-network/
+├── config/
+│   ├── config.py           # Configuration file for paths and hyperparameters
+├── data/
+│   ├── FEHDataStudent.xlsx # Input dataset for training and evaluation
+│   ├── compare-data.xlsx   # External dataset for prediction comparison
+├── models/
+│   ├── flood_predictor.py  # Prediction and evaluation logic
+│   ├── neural_network.py   # Neural network training logic
+├── processing/
+│   ├── data_processor.py   # Data loading and cleaning
+│   ├── data_splitter.py    # Data splitting logic
+│   ├── data_standardiser.py # Data standardization
+├── visualisation/
+│   ├── result_visualiser.py # Visualization logic for results and metrics
+├── artificial-neural-network.py  # Main script for training, prediction, and evaluation
+├── requirements.txt         # List of dependencies
+└── README.md                # Project documentation

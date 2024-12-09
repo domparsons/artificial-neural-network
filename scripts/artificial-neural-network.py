@@ -10,9 +10,6 @@ from visualisation.result_visualiser import ResultVisualiser
 
 
 def main():
-    import os
-    print("Current Working Directory:", os.getcwd())
-    print("Expected Path:", os.path.abspath("data/FEHDataStudent.xlsx"))
     data_processor = DataProcessor()
     df = data_processor.load_and_process_data(FilePaths.data_file, FilePaths.sheet_name, FilePaths.columns)
 
