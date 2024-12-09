@@ -12,7 +12,6 @@ class DataSplitter:
 
         train_size = int(train_size * len(self.df))
         val_size = int(val_size * len(self.df))
-        test_size = len(self.df) - train_size - val_size
 
         train_indices = indices[:train_size]
         val_indices = indices[train_size:(train_size + val_size)]
