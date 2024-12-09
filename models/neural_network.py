@@ -118,7 +118,7 @@ class NeuralNetwork:
         return hidden_layer_activations, output_layer_activations
 
     def backward_pass(self, inputs: np.ndarray, output_activations: np.ndarray,
-                      hidden_layer_activations: np.ndarray) -> list:
+                      hidden_layer_activations: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Perform a backward pass through the neural network to calculate deltas.
 
@@ -128,14 +128,13 @@ class NeuralNetwork:
         hidden_layer_activations (np.ndarray): The activations from the hidden layer.
 
         Returns:
-        list: A list of deltas for weight updates.
+        tuple: A tuple containing deltas for the output layer and hidden layer.
         """
-        deltas = [(inputs[-1] - output_activations[0]) * (output_activations[0] * (1 - output_activations[0]))]
+        output_deltas = (inputs[-1] - output_activations[0]) * (output_activations[0] * (1 - output_activations[0]))
+        hidden_deltas = (hidden_layer_activations * (1 - hidden_layer_activations)) * np.dot(output_deltas,
+                                                                                             self.output_layer_weights.T)
 
-        for x in range(self.hidden_layer_size):
-            deltas.append((hidden_layer_activations[x] * (1 - hidden_layer_activations[x])) * deltas[x] * self.hidden_layer_biases[x])
-
-        return deltas
+        return output_deltas, hidden_deltas
 
     def update_weights(self, inputs: np.ndarray, hidden_activations: np.ndarray, deltas: list, learning_rate: float,
                        momentum_rate: float) -> None:
