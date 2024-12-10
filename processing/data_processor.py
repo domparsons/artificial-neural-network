@@ -11,14 +11,14 @@ class DataProcessor:
         return df
 
     @staticmethod
-    def clean_data(self, df):
+    def clean_data(df):
         df = df.apply(pd.to_numeric, errors='coerce').dropna()
         df = df[(df >= 0).all(axis=1)]
 
         return df
 
     @staticmethod
-    def select_features(self, df, correlation_threshold, input_corr_threshold):
+    def select_features(df, correlation_threshold, input_corr_threshold):
         output_column = df.columns[-1]
         correlations = df.corr().iloc[:, -1]
         for col, corr in correlations.items():

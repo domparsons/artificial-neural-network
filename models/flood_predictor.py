@@ -60,7 +60,7 @@ class FloodPredictor:
 
         predictions = [self.unstandardise_data(output[0], min_index_flood, max_index_flood) for output in output_layer_activations]
 
-        predictions = [max(0, pred) for pred in predictions]
+        predictions = [max(0, int(pred)) for pred in predictions]
 
         return predictions
 
