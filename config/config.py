@@ -1,11 +1,22 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class FilePaths:
-    data_file = 'data/FEHDataStudent.xlsx'
-    compare_file: str = 'data/compare-data.xlsx'
-    sheet_name: str = 'Sheet1'
-    columns: list = ('AREA', 'BFIHOST', 'FARL', 'FPEXT', 'LDP', 'PROPWET', 'RMED-1D', 'SAAR', 'Index flood')
+    data_file = "data/FEHDataStudent.xlsx"
+    compare_file: str = "data/compare-data.xlsx"
+    sheet_name: str = "Sheet1"
+    columns: list = (
+        "AREA",
+        "BFIHOST",
+        "FARL",
+        "FPEXT",
+        "LDP",
+        "PROPWET",
+        "RMED-1D",
+        "SAAR",
+        "Index flood",
+    )
 
 
 @dataclass

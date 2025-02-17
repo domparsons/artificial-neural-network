@@ -49,13 +49,16 @@ class NeuralNetwork:
     simulated_annealing(start_lr, end_lr, max_epochs, current_epoch)
         Calculates the learning rate using simulated annealing.
     """
+
     def __init__(self, input_size, hidden_layer_size, output_size):
         self.input_size = input_size
         self.hidden_layer_size = hidden_layer_size
         self.output_size = output_size
 
         self.hidden_layer_weights = np.random.randn(input_size, hidden_layer_size) * 0.01
-        self.hidden_layer_biases = np.array([random.uniform(-0.1, 0.1) for _ in range(hidden_layer_size)])
+        self.hidden_layer_biases = np.array(
+            [random.uniform(-0.1, 0.1) for _ in range(hidden_layer_size)]
+        )
 
         self.output_layer_weights = np.random.randn(hidden_layer_size, output_size)
         self.output_layer_bias = random.uniform(-0.1, 0.1)
@@ -63,9 +66,16 @@ class NeuralNetwork:
         self.previous_output_weight_change = np.zeros_like(self.output_layer_weights)
         self.previous_hidden_weight_change = np.zeros_like(self.hidden_layer_weights)
 
-    def train(self, training_data: pd.DataFrame, validation_data: pd.DataFrame, epochs: int,
-              initial_learning_rate: float,
-              final_learning_rate: float, momentum_rate: float, epoch_split: int) -> tuple:
+    def train(
+        self,
+        training_data: pd.DataFrame,
+        validation_data: pd.DataFrame,
+        epochs: int,
+        initial_learning_rate: float,
+        final_learning_rate: float,
+        momentum_rate: float,
+        epoch_split: int,
+    ) -> tuple:
         """
         Train the neural network using the provided training and validation data.
 
@@ -84,20 +94,32 @@ class NeuralNetwork:
         mean_validation_errors = []
 
         for epoch in range(epochs):
-            learning_rate = self.simulated_annealing(initial_learning_rate, final_learning_rate, epochs, epoch)
+            learning_rate = self.simulated_annealing(
+                initial_learning_rate, final_learning_rate, epochs, epoch
+            )
 
             for _, row in training_data.iterrows():
                 hidden_layer_activations, output_layer_activations = self.forward_pass(row.values)
-                deltas = self.backward_pass(row.values, output_layer_activations, hidden_layer_activations)
+                deltas = self.backward_pass(
+                    row.values, output_layer_activations, hidden_layer_activations
+                )
 
-                self.update_weights(row.values, hidden_layer_activations, deltas, learning_rate, momentum_rate)
+                self.update_weights(
+                    row.values, hidden_layer_activations, deltas, learning_rate, momentum_rate
+                )
 
             if epoch % epoch_split == 0:
                 mean_validation_error = self.calculate_mean_validation_error(validation_data)
                 print(f"{epoch}: Error: {mean_validation_error}")
                 mean_validation_errors.append(mean_validation_error)
 
-        return mean_validation_errors, self.hidden_layer_weights, self.hidden_layer_biases, self.output_layer_weights, self.output_layer_bias
+        return (
+            mean_validation_errors,
+            self.hidden_layer_weights,
+            self.hidden_layer_biases,
+            self.output_layer_weights,
+            self.output_layer_bias,
+        )
 
     def forward_pass(self, inputs: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
@@ -109,16 +131,24 @@ class NeuralNetwork:
         Returns:
         tuple: A tuple containing the hidden layer activations and output layer activations.
         """
-        hidden_layer_weighted_sums = np.dot(inputs, self.hidden_layer_weights) + self.hidden_layer_biases
+        hidden_layer_weighted_sums = (
+            np.dot(inputs, self.hidden_layer_weights) + self.hidden_layer_biases
+        )
         hidden_layer_activations = self.sigmoid(hidden_layer_weighted_sums)
 
-        output_layer_weighted_sums = np.dot(hidden_layer_activations, self.output_layer_weights) + self.output_layer_bias
+        output_layer_weighted_sums = (
+            np.dot(hidden_layer_activations, self.output_layer_weights) + self.output_layer_bias
+        )
         output_layer_activations = self.sigmoid(output_layer_weighted_sums)
 
         return hidden_layer_activations, output_layer_activations
 
-    def backward_pass(self, inputs: np.ndarray, output_activations: np.ndarray,
-                      hidden_layer_activations: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def backward_pass(
+        self,
+        inputs: np.ndarray,
+        output_activations: np.ndarray,
+        hidden_layer_activations: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Perform a backward pass through the neural network to calculate deltas.
 
@@ -130,14 +160,23 @@ class NeuralNetwork:
         Returns:
         tuple: A tuple containing deltas for the output layer and hidden layer.
         """
-        output_deltas = (inputs[-1] - output_activations[0]) * (output_activations[0] * (1 - output_activations[0]))
-        hidden_deltas = (hidden_layer_activations * (1 - hidden_layer_activations)) * np.dot(output_deltas,
-                                                                                             self.output_layer_weights.T)
+        output_deltas = (inputs[-1] - output_activations[0]) * (
+            output_activations[0] * (1 - output_activations[0])
+        )
+        hidden_deltas = (hidden_layer_activations * (1 - hidden_layer_activations)) * np.dot(
+            output_deltas, self.output_layer_weights.T
+        )
 
         return output_deltas, hidden_deltas
 
-    def update_weights(self, inputs: np.ndarray, hidden_activations: np.ndarray, deltas: list, learning_rate: float,
-                       momentum_rate: float) -> None:
+    def update_weights(
+        self,
+        inputs: np.ndarray,
+        hidden_activations: np.ndarray,
+        deltas: list,
+        learning_rate: float,
+        momentum_rate: float,
+    ) -> None:
         """
         Update the weights of the neural network using the calculated deltas, learning rate, and momentum rate.
 
@@ -186,7 +225,9 @@ class NeuralNetwork:
         return 1 / (1 + np.exp(-x))
 
     @staticmethod
-    def simulated_annealing(start_lr: float, end_lr: float, max_epochs: int, current_epoch: int) -> float:
+    def simulated_annealing(
+        start_lr: float, end_lr: float, max_epochs: int, current_epoch: int
+    ) -> float:
         """
         Calculate the learning rate using simulated annealing.
 
@@ -199,7 +240,9 @@ class NeuralNetwork:
         Returns:
         float: The calculated learning rate for the current epoch.
         """
-        new_rate = ((end_lr + (start_lr - end_lr)) * (1 - (1 / (1 + np.exp(10 - ((20 * current_epoch) / max_epochs))))))
+        new_rate = (end_lr + (start_lr - end_lr)) * (
+            1 - (1 / (1 + np.exp(10 - ((20 * current_epoch) / max_epochs))))
+        )
         if new_rate > end_lr:
             return new_rate
         else:

@@ -1,7 +1,7 @@
 import numpy as np
 
-class DataSplitter:
 
+class DataSplitter:
     def __init__(self, df):
         self.df = df
 
@@ -14,8 +14,8 @@ class DataSplitter:
         val_size = int(val_size * len(self.df))
 
         train_indices = indices[:train_size]
-        val_indices = indices[train_size:(train_size + val_size)]
-        test_indices = indices[(train_size + val_size):]
+        val_indices = indices[train_size : (train_size + val_size)]
+        test_indices = indices[(train_size + val_size) :]
 
         training_data = self.df.loc[train_indices]
         validation_data = self.df.loc[val_indices]

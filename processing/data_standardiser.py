@@ -1,7 +1,7 @@
 import pandas as pd
 
-class DataStandardiser:
 
+class DataStandardiser:
     def __init__(self):
         pass
 
@@ -17,9 +17,15 @@ class DataStandardiser:
             max_value = train_and_validate[column].max()
 
             # Standardise the data using the calculated min and max for each set of data
-            standardised_training_data[column] = training_data[column].apply(lambda x: self.get_standardised_value(x, min_value, max_value))
-            standardised_validation_data[column] = validation_data[column].apply(lambda x: self.get_standardised_value(x, min_value, max_value))
-            standardised_testing_data[column] = testing_data[column].apply(lambda x: self.get_standardised_value(x, min_value, max_value))
+            standardised_training_data[column] = training_data[column].apply(
+                lambda x: self.get_standardised_value(x, min_value, max_value)
+            )
+            standardised_validation_data[column] = validation_data[column].apply(
+                lambda x: self.get_standardised_value(x, min_value, max_value)
+            )
+            standardised_testing_data[column] = testing_data[column].apply(
+                lambda x: self.get_standardised_value(x, min_value, max_value)
+            )
 
         return standardised_training_data, standardised_validation_data, standardised_testing_data
 

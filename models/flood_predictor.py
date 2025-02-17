@@ -3,6 +3,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 from sklearn.metrics import mean_absolute_error
 
+
 class FloodPredictor:
     """
     FloodPredictor class for predicting flood index values using a trained neural network.
@@ -14,7 +15,9 @@ class FloodPredictor:
         output_layer_bias (np.ndarray): Bias of the output layer.
     """
 
-    def __init__(self, hidden_layer_weights, hidden_layer_biases, output_layer_weights, output_layer_bias):
+    def __init__(
+        self, hidden_layer_weights, hidden_layer_biases, output_layer_weights, output_layer_bias
+    ):
         self.hidden_layer_weights = hidden_layer_weights
         self.hidden_layer_biases = hidden_layer_biases
         self.output_layer_weights = output_layer_weights
@@ -25,8 +28,10 @@ class FloodPredictor:
         return 1 / (1 + np.exp(-x))
 
     @staticmethod
-    def unstandardise_data(s: float, min_val: float, max_val: float, scaling_factor: float = 0.8) -> float:
-        """"
+    def unstandardise_data(
+        s: float, min_val: float, max_val: float, scaling_factor: float = 0.8
+    ) -> float:
+        """ "
         Convert standardised data back to its original scale.
 
         Parameters:
@@ -41,7 +46,9 @@ class FloodPredictor:
         r = ((s - 0.1) / scaling_factor) * (max_val - min_val) + min_val
         return r
 
-    def predict(self, standardised_testing_data: pd.DataFrame, train_and_validate: pd.DataFrame) -> list:
+    def predict(
+        self, standardised_testing_data: pd.DataFrame, train_and_validate: pd.DataFrame
+    ) -> list:
         """
         Predict the index flood values for the given standardised testing data.
 
@@ -52,13 +59,21 @@ class FloodPredictor:
         Returns:
         list: The predicted index flood values.
         """
-        min_index_flood = train_and_validate['Index flood'].min()
-        max_index_flood = train_and_validate['Index flood'].max()
+        min_index_flood = train_and_validate["Index flood"].min()
+        max_index_flood = train_and_validate["Index flood"].max()
 
-        hidden_layer_activations = self.sigmoid(np.dot(standardised_testing_data.iloc[:, :-1], self.hidden_layer_weights[:-1, :]) + self.hidden_layer_biases)
-        output_layer_activations = self.sigmoid(np.dot(hidden_layer_activations, self.output_layer_weights) + self.output_layer_bias)
+        hidden_layer_activations = self.sigmoid(
+            np.dot(standardised_testing_data.iloc[:, :-1], self.hidden_layer_weights[:-1, :])
+            + self.hidden_layer_biases
+        )
+        output_layer_activations = self.sigmoid(
+            np.dot(hidden_layer_activations, self.output_layer_weights) + self.output_layer_bias
+        )
 
-        predictions = [self.unstandardise_data(output[0], min_index_flood, max_index_flood) for output in output_layer_activations]
+        predictions = [
+            self.unstandardise_data(output[0], min_index_flood, max_index_flood)
+            for output in output_layer_activations
+        ]
 
         predictions = [max(0, int(pred)) for pred in predictions]
 

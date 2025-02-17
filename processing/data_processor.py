@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-class DataProcessor:
 
+class DataProcessor:
     def load_and_process_data(self, file_path, sheet_name, columns):
         df = pd.read_excel(file_path, sheet_name=sheet_name, usecols=columns).copy()
         df = self.clean_data(df)
@@ -12,7 +12,7 @@ class DataProcessor:
 
     @staticmethod
     def clean_data(df):
-        df = df.apply(pd.to_numeric, errors='coerce').dropna()
+        df = df.apply(pd.to_numeric, errors="coerce").dropna()
         df = df[(df >= 0).all(axis=1)]
 
         return df
@@ -28,8 +28,11 @@ class DataProcessor:
         correlations = df.corr().abs()
         upper_triangle = correlations.where(np.triu(np.ones(correlations.shape), k=1).astype(bool))
 
-        columns_to_drop = [column for column in upper_triangle.columns if
-                           any(upper_triangle[column] >= input_corr_threshold)]
+        columns_to_drop = [
+            column
+            for column in upper_triangle.columns
+            if any(upper_triangle[column] >= input_corr_threshold)
+        ]
         columns_to_drop = [col for col in columns_to_drop if col != output_column]
         df = df.drop(columns=columns_to_drop)
 
