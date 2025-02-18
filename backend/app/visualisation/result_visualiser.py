@@ -36,8 +36,12 @@ class ResultVisualiser:
         fig.show()
 
     @staticmethod
-    def print_prediction_data(correlation_coefficient, precision, threshold, mae):
+    def print_prediction_data(
+        correlation_coefficient, precision, threshold, mae
+    ) -> tuple:
         print("\nPrediction data:")
         print(f"Correlation: {correlation_coefficient * 100:.2f}%")
         print(f"Precision (within {threshold}): {precision * 100:.2f}%")
         print("Mean Absolute Error:", mae)
+
+        return correlation_coefficient, precision, mae

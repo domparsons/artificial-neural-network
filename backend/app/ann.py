@@ -1,15 +1,15 @@
 import pandas as pd
 
-from config.config import FilePaths, Hyperparameters
-from models.flood_predictor import FloodPredictor
-from models.neural_network import NeuralNetwork
-from processing.data_processor import DataProcessor
-from processing.data_splitter import DataSplitter
-from processing.data_standardiser import DataStandardiser
-from visualisation.result_visualiser import ResultVisualiser
+from app.config.config import FilePaths, Hyperparameters
+from app.models.flood_predictor import FloodPredictor
+from app.models.neural_network import NeuralNetwork
+from app.processing.data_processor import DataProcessor
+from app.processing.data_splitter import DataSplitter
+from app.processing.data_standardiser import DataStandardiser
+from app.visualisation.result_visualiser import ResultVisualiser
 
 
-def main():
+def main() -> tuple:
     data_processor = DataProcessor()
     df = data_processor.load_and_process_data(
         FilePaths.data_file, FilePaths.sheet_name, FilePaths.columns
@@ -20,10 +20,12 @@ def main():
 
     train_and_validate = pd.concat([training_data, validation_data], axis=0)
     standardiser = DataStandardiser()
-    standardised_training_data, standardised_validation_data, standardised_testing_data = (
-        standardiser.standardise_data(
-            train_and_validate, training_data, validation_data, testing_data
-        )
+    (
+        standardised_training_data,
+        standardised_validation_data,
+        standardised_testing_data,
+    ) = standardiser.standardise_data(
+        train_and_validate, training_data, validation_data, testing_data
     )
 
     input_size = len(standardised_training_data.columns)
@@ -47,7 +49,10 @@ def main():
     )
 
     flood_predictor = FloodPredictor(
-        hidden_layer_weights, hidden_layer_biases, output_layer_weights, output_layer_bias
+        hidden_layer_weights,
+        hidden_layer_biases,
+        output_layer_weights,
+        output_layer_bias,
     )
     y_predict = flood_predictor.predict(standardised_testing_data, train_and_validate)
     y_test = testing_data["Index flood"].values
@@ -59,9 +64,13 @@ def main():
     ResultVisualiser.show_validation_error_plot(
         Hyperparameters.epochs, Hyperparameters.epoch_split, mean_validation_errors
     )
-    ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
+    ResultVisualiser.print_prediction_data(
+        correlation_coefficient, precision, threshold, mae
+    )
 
-    compare_with_linest(FilePaths.compare_file, threshold)
+    # compare_with_linest(FilePaths.compare_file, threshold)
+
+    return correlation_coefficient, precision, mae
 
 
 def compare_with_linest(file_path, threshold):
@@ -73,7 +82,9 @@ def compare_with_linest(file_path, threshold):
     ResultVisualiser.show_scatter_plot(y_test, y_predict)
 
     correlation_coefficient, precision, mae = FloodPredictor.evaluate(y_test, y_predict)
-    ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
+    ResultVisualiser.print_prediction_data(
+        correlation_coefficient, precision, threshold, mae
+    )
 
 
 if __name__ == "__main__":

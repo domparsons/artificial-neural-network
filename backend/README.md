@@ -53,7 +53,7 @@ This project implements an Artificial Neural Network (ANN) to predict the *Index
 1. **Train the Model**: Run the main script to process the data, train the model, and visualize results:
 
     ```bash
-    python artificial-neural-network.py
+    python ann.py
     ```
 
 2. **Hyperparameter Tuning**: Adjust hyperparameters such as learning rate, hidden layer size, and number of epochs in `config/config.py`.

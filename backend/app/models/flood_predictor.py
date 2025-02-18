@@ -16,7 +16,11 @@ class FloodPredictor:
     """
 
     def __init__(
-        self, hidden_layer_weights, hidden_layer_biases, output_layer_weights, output_layer_bias
+        self,
+        hidden_layer_weights,
+        hidden_layer_biases,
+        output_layer_weights,
+        output_layer_bias,
     ):
         self.hidden_layer_weights = hidden_layer_weights
         self.hidden_layer_biases = hidden_layer_biases
@@ -63,11 +67,15 @@ class FloodPredictor:
         max_index_flood = train_and_validate["Index flood"].max()
 
         hidden_layer_activations = self.sigmoid(
-            np.dot(standardised_testing_data.iloc[:, :-1], self.hidden_layer_weights[:-1, :])
+            np.dot(
+                standardised_testing_data.iloc[:, :-1],
+                self.hidden_layer_weights[:-1, :],
+            )
             + self.hidden_layer_biases
         )
         output_layer_activations = self.sigmoid(
-            np.dot(hidden_layer_activations, self.output_layer_weights) + self.output_layer_bias
+            np.dot(hidden_layer_activations, self.output_layer_weights)
+            + self.output_layer_bias
         )
 
         predictions = [
@@ -80,7 +88,9 @@ class FloodPredictor:
         return predictions
 
     @staticmethod
-    def evaluate(y_test: np.ndarray, y_predict: np.ndarray, threshold: int = 60) -> tuple:
+    def evaluate(
+        y_test: np.ndarray, y_predict: np.ndarray, threshold: int = 60
+    ) -> tuple:
         """
         Evaluate the performance of the flood prediction model.
 
@@ -92,7 +102,7 @@ class FloodPredictor:
         Returns:
         tuple: A tuple containing the correlation coefficient, precision, and mean absolute error (MAE).
         """
-        correlation_coefficient, _ = pearsonr(y_test, y_predict)
+        correlation_coefficient = pearsonr(y_test, y_predict)
         within_threshold = np.sum(np.abs(y_test - y_predict) < threshold)
         precision = within_threshold / len(y_test)
         mae = mean_absolute_error(y_test, y_predict)

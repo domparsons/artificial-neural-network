@@ -1,10 +1,13 @@
 from dataclasses import dataclass
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 @dataclass
 class FilePaths:
-    data_file = "data/FEHDataStudent.xlsx"
-    compare_file: str = "data/compare-data.xlsx"
+    data_file: str = str(PROJECT_ROOT / "data" / "FEHDataStudent.xlsx")
+    compare_file: str = str(PROJECT_ROOT / "data" / "compare-data.xlsx")
     sheet_name: str = "Sheet1"
     columns: list = (
         "AREA",
