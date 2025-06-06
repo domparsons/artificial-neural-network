@@ -31,17 +31,10 @@ This project implements an Artificial Neural Network (ANN) to predict the *Index
     cd artificial-neural-network
     ```
 
-2. Set up a virtual environment (optional but recommended):
+2. Set up a virtual environment and install the requirements:
 
     ```bash
-    python -m venv env
-    source env/bin/activate  # On Windows: env\Scripts\activate
-    ```
-
-3. Install the required dependencies:
-
-    ```bash
-    pip install -r requirements.txt
+   uv sync
     ```
 
 4. Place the required Excel files (`FEHDataStudent.xlsx` and `compare-data.xlsx`) in the `data` directory.
