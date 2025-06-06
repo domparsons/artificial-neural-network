@@ -46,7 +46,7 @@ This project implements an Artificial Neural Network (ANN) to predict the *Index
 1. **Train the Model**: Run the main script to process the data, train the model, and visualize results:
 
     ```bash
-    python ann.py
+    python artificial-neural-network.py
     ```
 
 2. **Hyperparameter Tuning**: Adjust hyperparameters such as learning rate, hidden layer size, and number of epochs in `config/config.py`.
@@ -76,5 +76,6 @@ artificial-neural-network/
 ├── visualisation/
 │   ├── result_visualiser.py # Visualization logic for results and metrics
 ├── artificial-neural-network.py  # Main script for training, prediction, and evaluation
-├── requirements.txt         # List of dependencies
-└── README.md                # Project documentation
+├── pyproject.toml           # List of dependencies
+├── README.md                # Project documentation
+└── uv.lock                  # Lock file

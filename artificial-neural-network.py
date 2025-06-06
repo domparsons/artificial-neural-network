@@ -1,12 +1,12 @@
 import pandas as pd
 
-from app.config.config import FilePaths, Hyperparameters
-from app.models.flood_predictor import FloodPredictor
-from app.models.neural_network import NeuralNetwork
-from app.processing.data_processor import DataProcessor
-from app.processing.data_splitter import DataSplitter
-from app.processing.data_standardiser import DataStandardiser
-from app.visualisation.result_visualiser import ResultVisualiser
+from config.config import FilePaths, Hyperparameters
+from models.flood_predictor import FloodPredictor
+from models.neural_network import NeuralNetwork
+from processing.data_processor import DataProcessor
+from processing.data_splitter import DataSplitter
+from processing.data_standardiser import DataStandardiser
+from visualisation.result_visualiser import ResultVisualiser
 
 
 def main() -> tuple:
@@ -64,9 +64,7 @@ def main() -> tuple:
     ResultVisualiser.show_validation_error_plot(
         Hyperparameters.epochs, Hyperparameters.epoch_split, mean_validation_errors
     )
-    ResultVisualiser.print_prediction_data(
-        correlation_coefficient, precision, threshold, mae
-    )
+    ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
 
     # compare_with_linest(FilePaths.compare_file, threshold)
 
@@ -82,9 +80,7 @@ def compare_with_linest(file_path, threshold):
     ResultVisualiser.show_scatter_plot(y_test, y_predict)
 
     correlation_coefficient, precision, mae = FloodPredictor.evaluate(y_test, y_predict)
-    ResultVisualiser.print_prediction_data(
-        correlation_coefficient, precision, threshold, mae
-    )
+    ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
 
 
 if __name__ == "__main__":
