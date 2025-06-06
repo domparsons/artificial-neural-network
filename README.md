@@ -46,7 +46,7 @@ This project implements an Artificial Neural Network (ANN) to predict the *Index
 1. **Train the Model**: Run the main script to process the data, train the model, and visualize results:
 
     ```bash
-    python artificial-neural-network.py
+    python neural_network.py
     ```
 
 2. **Hyperparameter Tuning**: Adjust hyperparameters such as learning rate, hidden layer size, and number of epochs in `config/config.py`.
@@ -62,20 +62,20 @@ This project implements an Artificial Neural Network (ANN) to predict the *Index
 ```plaintext
 artificial-neural-network/
 ├── config/
-│   ├── config.py           # Configuration file for paths and hyperparameters
+│   ├── config.py             # Configuration file for paths and hyperparameters
 ├── data/
-│   ├── FEHDataStudent.xlsx # Input dataset for training and evaluation
-│   ├── compare-data.xlsx   # External dataset for prediction comparison
+│   ├── FEHDataStudent.xlsx   # Input dataset for training and evaluation
+│   ├── compare-data.xlsx     # External dataset for prediction comparison
 ├── models/
-│   ├── flood_predictor.py  # Prediction and evaluation logic
-│   ├── neural_network.py   # Neural network training logic
+│   ├── flood_predictor.py    # Prediction and evaluation logic
+│   ├── neural_network.py     # Neural network training logic
 ├── processing/
-│   ├── data_processor.py   # Data loading and cleaning
-│   ├── data_splitter.py    # Data splitting logic
-│   ├── data_standardiser.py # Data standardization
+│   ├── data_processor.py     # Data loading and cleaning
+│   ├── data_splitter.py      # Data splitting logic
+│   ├── data_standardiser.py  # Data standardization
 ├── visualisation/
-│   ├── result_visualiser.py # Visualization logic for results and metrics
-├── artificial-neural-network.py  # Main script for training, prediction, and evaluation
-├── pyproject.toml           # List of dependencies
-├── README.md                # Project documentation
-└── uv.lock                  # Lock file
+│   ├── result_visualiser.py  # Visualization logic for results and metrics
+├── neural_network.py         # Main script for training, prediction, and evaluation
+├── pyproject.toml            # List of dependencies
+├── README.md                 # Project documentation
+└── uv.lock                   # Lock file
