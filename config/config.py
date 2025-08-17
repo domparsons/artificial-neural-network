@@ -24,8 +24,7 @@ class FilePaths:
 
 @dataclass
 class Hyperparameters:
-    epochs: int = 400
-    epoch_split: int = 20
+    epochs: int = 300
     initial_learning_rate: float = 0.1
     final_learning_rate: float = 0.01
     hidden_layer_size: int = 10

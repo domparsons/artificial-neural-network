@@ -1,39 +1,46 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
-class DataProcessor:
-    def load_and_process_data(self, file_path, sheet_name, columns):
-        df = pd.read_excel(file_path, sheet_name=sheet_name, usecols=columns).copy()
-        df = self.clean_data(df)
-        df = self.select_features(df, correlation_threshold=0.2, input_corr_threshold=0.95)
+def load_data(file_path: str, sheet_name: str, columns: list) -> pd.DataFrame:
+    df = pd.read_excel(file_path, sheet_name=sheet_name, usecols=columns)
 
-        return df
+    return df
 
-    @staticmethod
-    def clean_data(df):
-        df = df.apply(pd.to_numeric, errors="coerce").dropna()
-        df = df[(df >= 0).all(axis=1)]
 
-        return df
+def process_data(df: pd.DataFrame, target_col: str) -> pd.DataFrame:
+    df = clean_data(df, target_col, impute_features=True)
+    df = select_features(df, target_col, correlation_threshold=0.2)
 
-    @staticmethod
-    def select_features(df, correlation_threshold, input_corr_threshold):
-        output_column = df.columns[-1]
-        correlations = df.corr().iloc[:, -1]
-        for col, corr in correlations.items():
-            if col != output_column and abs(corr) < correlation_threshold:
-                df = df.drop(columns=[col])
+    return df
 
-        correlations = df.corr().abs()
-        upper_triangle = correlations.where(np.triu(np.ones(correlations.shape), k=1).astype(bool))
 
-        columns_to_drop = [
-            column
-            for column in upper_triangle.columns
-            if any(upper_triangle[column] >= input_corr_threshold)
-        ]
-        columns_to_drop = [col for col in columns_to_drop if col != output_column]
-        df = df.drop(columns=columns_to_drop)
+def clean_data(
+    df: pd.DataFrame, target_col: str, impute_features: bool = True, sentinel: int = -999
+) -> pd.DataFrame:
+    df = df.apply(pd.to_numeric, errors="coerce")
+    df = df[df[target_col].notna() & (df[target_col] != sentinel)]
 
-        return df
+    if impute_features:
+        feature_cols = [c for c in df.columns if c != target_col]
+        df[feature_cols] = df[feature_cols].replace(sentinel, np.nan)
+        if impute_features:
+            df[feature_cols] = df[feature_cols].fillna(df[feature_cols].median())
+
+    df = df.dropna()
+
+    return df
+
+
+def select_features(
+    df: pd.DataFrame,
+    target_col: str,
+    correlation_threshold: float,
+) -> pd.DataFrame:
+    correlations = df.corr()[target_col]
+    to_drop = [
+        col
+        for col, corr in correlations.items()
+        if col != target_col and abs(corr) < correlation_threshold
+    ]
+    return df.drop(columns=to_drop)

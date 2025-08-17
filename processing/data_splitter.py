@@ -1,24 +1,23 @@
-import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
 
-class DataSplitter:
-    def __init__(self, df):
-        self.df = df
+def split_data(
+    df: pd.DataFrame,
+    target_col: str,
+    test_size: float = 0.2,
+    val_size: float = 0.1,
+    random_state: int = 42,
+):
+    x = df.drop(columns=target_col)
+    y = df[target_col]
 
-    def split_data(self, train_size=0.6, val_size=0.2):
-        np.random.seed(42)
+    x_train, x_temp, y_train, y_temp = train_test_split(
+        x, y, test_size=(test_size + val_size), random_state=random_state
+    )
+    val_ratio = val_size / (test_size + val_size)
+    x_val, x_test, y_val, y_test = train_test_split(
+        x_temp, y_temp, test_size=val_ratio, random_state=random_state
+    )
 
-        indices = np.random.permutation(self.df.index)
-
-        train_size = int(train_size * len(self.df))
-        val_size = int(val_size * len(self.df))
-
-        train_indices = indices[:train_size]
-        val_indices = indices[train_size : (train_size + val_size)]
-        test_indices = indices[(train_size + val_size) :]
-
-        training_data = self.df.loc[train_indices]
-        validation_data = self.df.loc[val_indices]
-        testing_data = self.df.loc[test_indices]
-
-        return training_data, validation_data, testing_data
+    return x_train, x_val, x_test, y_train, y_val, y_test

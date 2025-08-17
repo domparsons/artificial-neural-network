@@ -28,8 +28,8 @@ class FloodPredictor:
         self.output_layer_bias = output_layer_bias
 
     @staticmethod
-    def sigmoid(x):
-        return 1 / (1 + np.exp(-x))
+    def leaky_relu(x, alpha=0.01):
+        return np.where(x > 0, x, alpha * x)
 
     @staticmethod
     def unstandardise_data(
@@ -51,45 +51,48 @@ class FloodPredictor:
         return r
 
     def predict(
-        self, standardised_testing_data: pd.DataFrame, train_and_validate: pd.DataFrame
+        self,
+        standardised_testing_data: pd.DataFrame,
+        y_test: pd.Series,
     ) -> list:
         """
         Predict the index flood values for the given standardised testing data.
 
         Parameters:
         standardised_testing_data (pandas.DataFrame): The standardised testing data.
-        train_and_validate (pandas.DataFrame): The training and validation data used to determine the min and max index flood values.
+        y_train (pandas.Series): Used only to unstandardise predictions.
 
         Returns:
         list: The predicted index flood values.
         """
-        min_index_flood = train_and_validate["Index flood"].min()
-        max_index_flood = train_and_validate["Index flood"].max()
+        min_index_flood = y_test.min()
+        max_index_flood = y_test.max()
 
-        hidden_layer_activations = self.sigmoid(
-            np.dot(
-                standardised_testing_data.iloc[:, :-1],
-                self.hidden_layer_weights[:-1, :],
+        predictions = []
+        for idx, row in standardised_testing_data.iterrows():
+            hidden_layer_weighted_sums = (
+                np.dot(row.values, self.hidden_layer_weights)
+                + self.hidden_layer_biases
             )
-            + self.hidden_layer_biases
-        )
-        output_layer_activations = self.sigmoid(
-            np.dot(hidden_layer_activations, self.output_layer_weights)
-            + self.output_layer_bias
-        )
+            hidden_layer_activations = self.leaky_relu(
+                hidden_layer_weighted_sums
+            )
 
-        predictions = [
-            self.unstandardise_data(output[0], min_index_flood, max_index_flood)
-            for output in output_layer_activations
-        ]
-
-        predictions = [max(0, int(pred)) for pred in predictions]
+            output_layer_weighted_sums = (
+                np.dot(hidden_layer_activations, self.output_layer_weights)
+                + self.output_layer_bias
+            )
+            output_layer_activations = output_layer_weighted_sums
+            pred = self.unstandardise_data(
+                output_layer_activations[0], min_index_flood, max_index_flood
+            )
+            predictions.append(max(0, int(pred)))
 
         return predictions
 
     @staticmethod
     def evaluate(
-        y_test: np.ndarray, y_predict: np.ndarray, threshold: int = 60
+        y_test: np.ndarray, y_predict: list, threshold: int = 60
     ) -> tuple:
         """
         Evaluate the performance of the flood prediction model.

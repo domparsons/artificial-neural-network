@@ -1,37 +1,35 @@
-import pandas as pd
-
 from config.config import FilePaths, Hyperparameters
 from models.flood_predictor import FloodPredictor
 from models.neural_network import NeuralNetwork
-from processing.data_processor import DataProcessor
-from processing.data_splitter import DataSplitter
-from processing.data_standardiser import DataStandardiser
+from processing.data_processor import load_data, process_data
+from processing.data_splitter import split_data
+from processing.data_standardiser import standardise_data
 from visualisation.result_visualiser import ResultVisualiser
 
 
-def main() -> tuple:
-    data_processor = DataProcessor()
-    df = data_processor.load_and_process_data(
-        FilePaths.data_file, FilePaths.sheet_name, FilePaths.columns
-    )
+def main():
+    df = load_data(FilePaths.data_file, FilePaths.sheet_name, FilePaths.columns)
+    target_col = df.columns.tolist()[-1]
+    df = process_data(df, target_col)
 
-    splitter = DataSplitter(df)
-    training_data, validation_data, testing_data = splitter.split_data()
+    x_train, x_val, x_test, y_train, y_val, y_test = split_data(df, target_col)
 
-    train_and_validate = pd.concat([training_data, validation_data], axis=0)
-    standardiser = DataStandardiser()
     (
-        standardised_training_data,
-        standardised_validation_data,
-        standardised_testing_data,
-    ) = standardiser.standardise_data(
-        train_and_validate, training_data, validation_data, testing_data
+        x_train_standardised,
+        x_val_standardised,
+        x_test_standardised,
+        y_train_standardised,
+        y_val_standardised,
+        y_test_standardised,
+        input_size,
+    ) = standardise_data(x_train, x_val, x_test, y_train, y_val, y_test)
+
+    neural_network = NeuralNetwork(
+        input_size,
+        Hyperparameters.hidden_layer_size,
+        Hyperparameters.output_size,
     )
 
-    input_size = len(standardised_training_data.columns)
-    neural_network = NeuralNetwork(
-        input_size, Hyperparameters.hidden_layer_size, Hyperparameters.output_size
-    )
     (
         mean_validation_errors,
         hidden_layer_weights,
@@ -39,13 +37,14 @@ def main() -> tuple:
         output_layer_weights,
         output_layer_bias,
     ) = neural_network.train(
-        standardised_training_data,
-        standardised_validation_data,
+        x_train_standardised,
+        x_val_standardised,
+        y_train_standardised,
+        y_val_standardised,
         Hyperparameters.epochs,
         Hyperparameters.initial_learning_rate,
         Hyperparameters.final_learning_rate,
         Hyperparameters.momentum_rate,
-        Hyperparameters.epoch_split,
     )
 
     flood_predictor = FloodPredictor(
@@ -54,33 +53,22 @@ def main() -> tuple:
         output_layer_weights,
         output_layer_bias,
     )
-    y_predict = flood_predictor.predict(standardised_testing_data, train_and_validate)
-    y_test = testing_data["Index flood"].values
+    y_predict = flood_predictor.predict(x_test_standardised, y_test)
+    y_test = y_test.values
 
-    correlation_coefficient, precision, mae = FloodPredictor.evaluate(y_test, y_predict)
+    correlation_coefficient, precision, mae = FloodPredictor.evaluate(
+        y_test, y_predict
+    )
     threshold = 60
 
     ResultVisualiser.show_scatter_plot(y_test, y_predict)
     ResultVisualiser.show_validation_error_plot(
-        Hyperparameters.epochs, Hyperparameters.epoch_split, mean_validation_errors
+        Hyperparameters.epochs,
+        mean_validation_errors,
     )
-    ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
-
-    # compare_with_linest(FilePaths.compare_file, threshold)
-
-    return correlation_coefficient, precision, mae
-
-
-def compare_with_linest(file_path, threshold):
-    columns = ["Index flood", "Pred"]
-    df = pd.read_excel(file_path, usecols=columns)
-    y_test = df["Index flood"].values
-    y_predict = df["Pred"].values
-
-    ResultVisualiser.show_scatter_plot(y_test, y_predict)
-
-    correlation_coefficient, precision, mae = FloodPredictor.evaluate(y_test, y_predict)
-    ResultVisualiser.print_prediction_data(correlation_coefficient, precision, threshold, mae)
+    ResultVisualiser.print_prediction_data(
+        correlation_coefficient, precision, threshold, mae
+    )
 
 
 if __name__ == "__main__":

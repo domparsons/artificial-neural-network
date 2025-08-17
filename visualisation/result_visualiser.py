@@ -16,7 +16,9 @@ class ResultVisualiser:
         fig.show()
 
     @staticmethod
-    def show_validation_error_plot(epochs, epoch_split, mean_validation_errors):
+    def show_validation_error_plot(
+        epochs, mean_validation_errors, epoch_split: int = 1
+    ):
         fig = go.Figure()
         fig.add_trace(
             go.Scatter(
@@ -40,7 +42,7 @@ class ResultVisualiser:
         correlation_coefficient, precision, threshold, mae
     ) -> tuple:
         print("\nPrediction data:")
-        print(f"Correlation: {correlation_coefficient * 100:.2f}%")
+        print(f"Correlation: {correlation_coefficient.correlation * 100:.2f}%")
         print(f"Precision (within {threshold}): {precision * 100:.2f}%")
         print("Mean Absolute Error:", mae)
 
