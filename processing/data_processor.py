@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def load_data(file_path: str, sheet_name: str, columns: list) -> pd.DataFrame:
+def load_data(file_path: str, sheet_name: str, columns) -> pd.DataFrame:
     df = pd.read_excel(file_path, sheet_name=sheet_name, usecols=columns)
 
     return df
@@ -16,16 +16,21 @@ def process_data(df: pd.DataFrame, target_col: str) -> pd.DataFrame:
 
 
 def clean_data(
-    df: pd.DataFrame, target_col: str, impute_features: bool = True, sentinel: int = -999
+    df: pd.DataFrame,
+    target_col: str,
+    impute_features: bool = True,
+    sentinel: int = -999,
 ) -> pd.DataFrame:
     df = df.apply(pd.to_numeric, errors="coerce")
     df = df[df[target_col].notna() & (df[target_col] != sentinel)]
 
     if impute_features:
-        feature_cols = [c for c in df.columns if c != target_col]
+        feature_cols = df.columns.difference([target_col])
         df[feature_cols] = df[feature_cols].replace(sentinel, np.nan)
         if impute_features:
-            df[feature_cols] = df[feature_cols].fillna(df[feature_cols].median())
+            df[feature_cols] = df[feature_cols].fillna(
+                df[feature_cols].median()
+            )
 
     df = df.dropna()
 

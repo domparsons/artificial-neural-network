@@ -120,7 +120,7 @@ class NeuralNetwork:
         hidden_layer_weighted_sums: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
         y_pred = output_activations[0]
-        output_delta = (y_true - y_pred) * (y_pred * (1 - y_pred))
+        output_delta = y_true - y_pred
 
         hidden_delta = self.leaky_relu_derivative(
             hidden_layer_weighted_sums

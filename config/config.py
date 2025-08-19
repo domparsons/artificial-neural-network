@@ -29,4 +29,4 @@ class Hyperparameters:
     final_learning_rate: float = 0.01
     hidden_layer_size: int = 10
     output_size: int = 1
-    momentum_rate: float = 0.8
+    momentum_rate: float = 0.7
