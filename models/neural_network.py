@@ -50,33 +50,37 @@ class NeuralNetwork:
     ) -> tuple:
         mean_validation_errors = []
 
+        import time
+
+        start_time = time.time()
+
+        X = x_train_standardised.to_numpy(dtype=float)
+        y = y_train.to_numpy(dtype=float).reshape(-1, 1)
+
         for epoch in range(epochs):
             learning_rate = self.simulated_annealing(
                 initial_learning_rate, final_learning_rate, epochs, epoch
             )
 
-            for idx, row in x_train_standardised.iterrows():
-                (
-                    hidden_layer_activations,
-                    output_layer_activations,
-                    hidden_layer_weighted_sums,
-                ) = self.forward_pass(row.values)
+            (
+                hidden_layer_activations,
+                output_layer_activations,
+                hidden_layer_weighted_sums,
+            ) = self.forward_pass(X)
 
-                y_true = y_train.loc[idx]
-                output_delta, hidden_delta = self.backward_pass(
-                    y_true,
-                    output_layer_activations,
-                    hidden_layer_weighted_sums,
-                )
-
-                self.update_weights(
-                    row.values,
-                    hidden_layer_activations,
-                    output_delta,
-                    hidden_delta,
-                    learning_rate,
-                    momentum_rate,
-                )
+            output_delta, hidden_delta = self.backward_pass(
+                y,
+                output_layer_activations,
+                hidden_layer_weighted_sums,
+            )
+            self.update_weights(
+                X,
+                hidden_layer_activations,
+                output_delta,
+                hidden_delta,
+                learning_rate,
+                momentum_rate,
+            )
 
             if epoch % epoch_split == 0:
                 mean_validation_error = self.calculate_mean_validation_error(
@@ -84,6 +88,10 @@ class NeuralNetwork:
                 )
                 print(f"{epoch}: Error: {mean_validation_error}")
                 mean_validation_errors.append(mean_validation_error)
+
+        end_time = time.time()
+
+        print(end_time - start_time)
 
         return (
             mean_validation_errors,
@@ -115,11 +123,11 @@ class NeuralNetwork:
 
     def backward_pass(
         self,
-        y_true: float,
+        y_true: np.ndarray,
         output_activations: np.ndarray,
         hidden_layer_weighted_sums: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        y_pred = output_activations[0]
+        y_pred = output_activations
         output_delta = y_true - y_pred
 
         hidden_delta = self.leaky_relu_derivative(
@@ -141,22 +149,29 @@ class NeuralNetwork:
         learning_rate: float,
         momentum_rate: float,
     ) -> None:
-        output_weight_change = learning_rate * np.outer(
-            hidden_activations, output_delta
-        )
-        hidden_weight_change = learning_rate * np.outer(inputs, hidden_delta)
+        batch_size = inputs.shape[0]
 
-        output_weight_change += (
-            momentum_rate * self.previous_output_weight_change
+        grad_output_weights = (
+            np.dot(hidden_activations.T, output_delta) / batch_size
         )
-        hidden_weight_change += (
-            momentum_rate * self.previous_hidden_weight_change
+        grad_hidden_weights = np.dot(inputs.T, hidden_delta) / batch_size
+
+        grad_output_bias = np.mean(output_delta, axis=0)
+        grad_hidden_bias = np.mean(hidden_delta, axis=0)
+
+        output_weight_change = (
+            learning_rate * grad_output_weights
+            + momentum_rate * self.previous_output_weight_change
+        )
+        hidden_weight_change = (
+            learning_rate * grad_hidden_weights
+            + momentum_rate * self.previous_hidden_weight_change
         )
 
         self.output_layer_weights += output_weight_change
-        self.output_layer_bias += learning_rate * output_delta
-
+        self.output_layer_bias += learning_rate * grad_output_bias
         self.hidden_layer_weights += hidden_weight_change
+        self.hidden_layer_biases += learning_rate * grad_hidden_bias
 
         self.previous_output_weight_change = output_weight_change
         self.previous_hidden_weight_change = hidden_weight_change
