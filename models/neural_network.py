@@ -50,10 +50,6 @@ class NeuralNetwork:
     ) -> tuple:
         mean_validation_errors = []
 
-        import time
-
-        start_time = time.time()
-
         X = x_train_standardised.to_numpy(dtype=float)
         y = y_train.to_numpy(dtype=float).reshape(-1, 1)
 
@@ -88,10 +84,6 @@ class NeuralNetwork:
                 )
                 print(f"{epoch}: Error: {mean_validation_error}")
                 mean_validation_errors.append(mean_validation_error)
-
-        end_time = time.time()
-
-        print(end_time - start_time)
 
         return (
             mean_validation_errors,
